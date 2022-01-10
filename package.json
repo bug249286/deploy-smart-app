@@ -1,0 +1,26 @@
+{
+  "name": "deploy-smart-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bin": {
+    "nest-deploy-smart": "./nest-deploy-smart/start.js",
+    "nuxt-deploy-smart": "./nuxt-deploy-smart/start.js",
+    "node-deploy-smart": "./node-deploy-smart/start.js"
+  },
+  "preferGlobal": true,
+  "dependencies": {
+    "abs": "^1.3.14",
+    "commander": "^8.3.0",
+    "fs-extra": "^10.0.0",
+    "md5": "^2.3.0",
+    "node-ssh": "^12.0.2",
+    "rimraf": "^3.0.2"
+  }
+}
