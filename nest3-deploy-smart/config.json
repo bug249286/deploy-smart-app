@@ -1,0 +1,19 @@
+{
+    "appName": "service-xxx",
+    "appBuild": "service-xxx",
+    "port": "-p xxx:9999",
+    "volume": "",
+    "pathVerify": "",
+    "textVerify": "",
+    "network":"--network=xxxx",
+    "useEnv":true,
+    "packageJsonPath":"../../package.json",
+    "basename":"service",
+    "server": {
+      "sudo": "",
+      "host": "xxx",
+      "username": "xxx",
+      "pem": "xxx",
+      "deploymentDir": "xxx"
+    }
+  }
