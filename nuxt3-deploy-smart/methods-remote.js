@@ -94,16 +94,8 @@ module.exports = {
         try {
             let cwd_process = process.cwd();
             await ssh.putFile(
-                `${cwd_process}/nuxt.tar.gz`,
-                `${_config.server.deploymentDir}/${_config.appName}/nuxt.tar.gz`
-            );
-            await ssh.putFile(
-                `${cwd_process}/public.tar.gz`,
-                `${_config.server.deploymentDir}/${_config.appName}/public.tar.gz`
-            );
-            await ssh.putFile(
-                `${cwd_process}/nuxt.config.js`,
-                `${_config.server.deploymentDir}/${_config.appName}/nuxt.config.js`
+                `${cwd_process}/output.tar.gz`,
+                `${_config.server.deploymentDir}/${_config.appName}/output.tar.gz`
             );
 
             if (fs.existsSync(`${cwd_process}/language.tar.gz`)) {
@@ -145,18 +137,14 @@ module.exports = {
         await this.runCommand(cmd, ssh, "Run Container completed");
         //}
 
-        cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/.nuxt ${_config.appName}:/usr/src/app/.nuxt`;
-        await this.runCommand(cmd, ssh, "copy nuxt success ");
+        cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/.output ${_config.appName}:/usr/src/app/.output`;
+        await this.runCommand(cmd, ssh, "copy output success ");
 
-        cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/public ${_config.appName}:/usr/src/app/public`;
-        await this.runCommand(cmd, ssh, "copy public success ");
         try{
             cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/language ${_config.appName}:/usr/src/app/language`;
             await this.runCommand(cmd, ssh, "copy language success ");
         }catch(e){}
 
-        cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/nuxt.config.js ${_config.appName}:/usr/src/app/nuxt.config.js`;
-        await this.runCommand(cmd, ssh, "copy nuxt.config.js success ");
         if (_config.useEnv === true) {
             cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/.env ${_config.appName}:/usr/src/app/.env`;
             await this.runCommand(cmd, ssh, "copy .env success ");
@@ -213,10 +201,8 @@ module.exports = {
     upzip: async function (_config, ssh) {
         console.log("Start unzip");
         console.log("");
-        let cmd = `cd ${_config.server.deploymentDir}/${_config.appName}  && rm -rf .nuxt && tar -xf nuxt.tar.gz`;
+        let cmd = `cd ${_config.server.deploymentDir}/${_config.appName}  && rm -rf .output && tar -xf output.tar.gz`;
         await this.runCommand(cmd, ssh, "upzip");
-        let cmd2 = `cd ${_config.server.deploymentDir}/${_config.appName}  && rm -rf public && tar -xf public.tar.gz`;
-        await this.runCommand(cmd2, ssh, "upzip");
         try{
             let cmd2 = `cd ${_config.server.deploymentDir}/${_config.appName}  && rm -rf language && tar -xf language.tar.gz`;
             await this.runCommand(cmd2, ssh, "upzip");

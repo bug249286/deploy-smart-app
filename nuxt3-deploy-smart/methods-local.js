@@ -37,26 +37,27 @@ module.exports = {
   build: async function (deployJsonName = "config.json") {
     let cwd_process = process.cwd();
     try {
-      let command_env_dev = `cd .. && mv .env .env-dev`;
-      await this.runCommand(command_env_dev);
-      let command_env_pro = `cp .env ../.env`;
-      await this.runCommand(command_env_pro);
-
-      let command_config_dev = `cd .. && mv nuxt.config.js nuxt.config-dev.js`;
-      await this.runCommand(command_config_dev);
-      let command_config_pro = `cp nuxt.config.js ../nuxt.config.js`;
-      await this.runCommand(command_config_pro);
-
+      let config = require(path.resolve(cwd_process, deployJsonName));
+      if (typeof config.useEnv === 'boolean' && config.useEnv === true) {
+        let command_env_dev = `cd .. && mv .env .env-dev`;
+        await this.runCommand(command_env_dev);
+        let command_env_pro = `cp .env ../.env`;
+        await this.runCommand(command_env_pro);
+      }
+      if (typeof config.useConfig === 'boolean' && config.useConfig === true) {
+        let command_config_dev = `cd .. && mv nuxt.config.ts nuxt.config-dev.ts`;
+        await this.runCommand(command_config_dev);
+        let command_config_pro = `cp nuxt.config.ts ../nuxt.config.ts`;
+        await this.runCommand(command_config_pro);
+      }
       let command1 = `cd .. && npm run build`;
       await this.runCommand(command1);
-      let command2 = `cd .. && tar czf ${cwd_process}/nuxt.tar.gz .nuxt`;
+      let command2 = `cd .. && tar czf ${cwd_process}/output.tar.gz .output`;
       await this.runCommand(command2);
-      let command3 = `cd .. && tar czf ${cwd_process}/public.tar.gz public`;
-      await this.runCommand(command3);
       try {
         let command5 = `cd .. && tar czf ${cwd_process}/language.tar.gz language`;
         await this.runCommand(command5);
-      } catch (e) {}
+      } catch (e) { }
       console.log("building SUCCESS");
       return true;
     } catch (err) {
@@ -66,6 +67,7 @@ module.exports = {
   },
   remove: async function (deployJsonName = "config.json") {
     let cwd_process = process.cwd();
+    let config = require(path.resolve(cwd_process, deployJsonName));
     if (fs.existsSync(`${cwd_process}/package.tar.gz`)) {
       await this.removeFolder(`${cwd_process}/package.tar.gz`);
     }
@@ -75,22 +77,20 @@ module.exports = {
     if (fs.existsSync(`${cwd_process}/package-lock.json`)) {
       await this.removeFolder(`${cwd_process}/package-lock.json`);
     }
-    if (fs.existsSync(`${cwd_process}/nuxt.tar.gz`)) {
-      await this.removeFolder(`${cwd_process}/nuxt.tar.gz`);
-    }
-    if (fs.existsSync(`${cwd_process}/public.tar.gz`)) {
-      await this.removeFolder(`${cwd_process}/public.tar.gz`);
-    }
-    if (fs.existsSync(`${cwd_process}/nuxt.config.js`)) {
-      await this.removeFolder(`${cwd_process}/nuxt.config.js`);
+    if (fs.existsSync(`${cwd_process}/output.tar.gz`)) {
+      await this.removeFolder(`${cwd_process}/output.tar.gz`);
     }
     if (fs.existsSync(`${cwd_process}/language.tar.gz`)) {
       await this.removeFolder(`${cwd_process}/language.tar.gz`);
     }
-    let command_env_dev = `cd .. && rm .env && mv .env-dev .env`;
-    await this.runCommand(command_env_dev);
-    let command_config_dev = `cd .. && rm .nuxt.config.js && mv .nuxt.config-dev.js nuxt.config.js`;
-    await this.runCommand(command_config_dev);
+    if (typeof config.useEnv === 'boolean' && config.useEnv === true) {
+      let command_env_dev = `cd .. && rm .env && mv .env-dev .env`;
+      await this.runCommand(command_env_dev);
+    }
+    if (typeof config.useConfig === 'boolean' && config.useConfig === true) {
+      let command_config_dev = `cd .. && rm nuxt.config.ts && mv nuxt.config-dev.ts nuxt.config.ts`;
+      await this.runCommand(command_config_dev);
+    }
     console.log("clear docker images SUCCESS");
   },
 };

@@ -1,0 +1,29 @@
+FROM node:14 As build
+RUN export METEOR_NO_RELEASE_CHECK=true
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install curl && \
+    apt-get install bash && \
+    apt-get install g++ && \
+    apt-get install make && \
+    apt-get install python3 && \
+    curl https://install.meteor.com | sh
+  
+WORKDIR /usr/src/app
+COPY project project/
+RUN /usr/local/bin/meteor --version --allow-superuser
+RUN cd /usr/src/app/project && npm install
+RUN cd /usr/src/app/project && /usr/local/bin/meteor build --allow-superuser --architecture os.linux.x86_64 --directory /usr/src/app/
+
+FROM node:14 As production
+RUN apt-get update && apt-get upgrade -y
+WORKDIR /usr/src/app
+ENV NODE_ENV production
+ENV TZ=Asia/Bangkok
+ENV PORT 9200
+ENV HTTP_FORWARDED_COUNT 1
+ENV NODE_OPTIONS --max-old-space-size=4096
+ENV TOOL_NODE_FLAGS --max-old-space-size=4096
+COPY --from=build /usr/src/app/bundle ./bundle
+RUN cd /usr/src/app/bundle/programs/server && npm install --only=production
+EXPOSE 9200
+CMD ["node","bundle/main.js"]

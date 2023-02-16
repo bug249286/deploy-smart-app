@@ -89,24 +89,16 @@ module.exports = {
         }
     },
     upToServer: async function (_config, ssh) {
-        console.log("Start upload Dockerfile && .env");
+        console.log("Start upload Dockerfile");
         console.log("");
         try {
             let cwd_process = process.cwd();
             await ssh.putFile(
-                `${cwd_process}/src.tar.gz`,
-                `${_config.server.deploymentDir}/${_config.appName}/src.tar.gz`
+                `${cwd_process}/project.tar.gz`,
+                `${_config.server.deploymentDir}/${_config.appName}/project.tar.gz`
             );
-            if (_config.useEnv === true) {
-                await ssh.putFile(
-                    `${cwd_process}/.env`,
-                    `${_config.server.deploymentDir}/${_config.appName}/.env`
-                );
-                console.log("Upload Dockerfile && .env Success");
-            }
-            console.log("Upload Dockerfile && .env Success");
         } catch (err) {
-            console.log("Upload Dockerfile && .env Fail");
+            console.log("Upload Dockerfile && settings.json Fail");
             console.log(err);
             return false;
         }
@@ -123,20 +115,17 @@ module.exports = {
 
         let _version_ = fs.readFileSync('image-base-version', 'utf8');
         if (_version_) _version_ = _version_.toString();
+        //let setting_command = `export METEOR_SETTINGS=$(cat ${_config.server.deploymentDir}/${_config.appName}/settings.json)`;
+        //await this.runCommand(setting_command, ssh, "setting_command");
+        let cmd = `${_config.server.sudo} docker stop ${_config.appName} && docker rm -f ${_config.appName} || echo 'not' 1>&2 && ${_config.server.sudo} docker run -e METEOR_SETTINGS="$(cat ${_config.server.deploymentDir}/${_config.appName}/settings.json)" ${_config.env} --restart=always --name ${_config.appName} ${network} -d ${_config.volume} ${_config.port} ${_config.basename}:${_version_}`;
+        await this.runCommand(cmd, ssh, "Run Container completed");
 
-        if (isRemoteBase === false || (typeof _config.is_new_base ==='boolean' && _config.is_new_base===true)) {
-            let cmd = `${_config.server.sudo} docker stop ${_config.appName} && docker rm -f ${_config.appName} || echo 'not' 1>&2 && ${_config.server.sudo} docker run --restart=always --name ${_config.appName} ${network} -d ${_config.volume} ${_config.port} ${_config.basename}:${_version_}`;
-            await this.runCommand(cmd, ssh, "Run Container completed");
-        }
-        cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/src ${_config.appName}:/usr/src/app/src`;
-        await this.runCommand(cmd, ssh, "copy dist success ");
-        if (_config.useEnv === true) {
-            cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/.env ${_config.appName}:/usr/src/app/.env`;
-            await this.runCommand(cmd, ssh, "copy .env success ");
-        }
-        //await ssh.exec(`docker exec -t ${_config.appName} pm2 restart 0`,[],{});
-        cmd = `${_config.server.sudo} docker exec -t ${_config.appName} pm2 restart 0`;
-        await this.runCommand(cmd, ssh, "restart success ");
+       // cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/bundle ${_config.appName}:/usr/src/app/bundle`;
+       // await this.runCommand(cmd, ssh, "copy dist success ");
+       // cmd = `${_config.server.sudo} docker exec -t ${_config.appName} cd bundle/programs/server && npm install --production`;
+       // await this.runCommand(cmd, ssh, "Install NPM Production ");
+       // cmd = `${_config.server.sudo} docker exec -t ${_config.appName} pm2 restart 0`;
+       // await this.runCommand(cmd, ssh, "restart success ");
     },
 
     clean: async function (_config, ssh) {
@@ -144,6 +133,7 @@ module.exports = {
         console.log(""); //docker image prune --filter="dangling=true"
         let cmd = `${_config.server.sudo} docker image prune --filter="dangling=true" -f`;
         return await this.runCommand(cmd, ssh, "Start Clean!!");
+        //return true;
     },
     isSuccess: async function (_config, ssh) {
         if (_config.textVerify) {
@@ -186,12 +176,13 @@ module.exports = {
         console.log("Start Delete File");
         let cmd = `rm -rf ${_config.server.deploymentDir}/${_config.appName}`;
         return await this.runCommand(cmd, ssh, "deleteFiles");
+     //return true;
     },
 
     upzip: async function (_config, ssh) {
         console.log("Start unzip");
         console.log("");
-        let cmd = `cd ${_config.server.deploymentDir}/${_config.appName}  && rm -rf src && tar -xf src.tar.gz`;
+        let cmd = `cd ${_config.server.deploymentDir}/${_config.appName}  && rm -rf project && tar -xf project.tar.gz --one-top-level=project`;
         await this.runCommand(cmd, ssh, "upzip");
         return true;
     },

@@ -1,0 +1,21 @@
+{
+  "appName": "xxx-pre",
+  "port": " -p 127.0.0.1:9200:9200 --add-host host.docker.internal:host-gateway",
+  "volume": " -v /xxx/xxx-xxx:/usr/src/app/public",
+  "env":"-e ROOT_URL=https://xxx.xxx.io -e MONGO_URL=mongodb://host.docker.internal:27017/xxx ",
+  "pathVerify": "",
+  "textVerify": "",
+  "network":"--network=xxx-pre-project",
+  "useEnv":true,
+  "is_new_base":true,
+  "packageJsonPath":"../package.json",
+  "basename":"xxx-pre",
+  "excludes":[".deploy",".deploy-pre-smart",".vscode"],
+  "server": {
+    "sudo": "",
+    "host": "xxxx",
+    "username": "xxx",
+    "pem": "/Users/mahadoang/.ssh/id_rsa",
+    "deploymentDir": "xxxx"
+  }
+}

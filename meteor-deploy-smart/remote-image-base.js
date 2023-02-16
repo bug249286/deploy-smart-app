@@ -122,11 +122,15 @@ module.exports = {
             let cwd_process = process.cwd();
             await ssh.putFile(
                 `${cwd_process}/DockerfileProduction`,
-                `${_config.server.deploymentDir}/${_config.basename}/Dockerfile`
+                `${_config.server.deploymentDir}/${_config.appName}/Dockerfile`
             );
+            // await ssh.putFile(
+            //     `${cwd_process}/project.tar.gz`,
+            //     `${_config.server.deploymentDir}/${_config.appName}/project.tar.gz`
+            // );
             await ssh.putFile(
-                `${cwd_process}/package.json`,
-                `${_config.server.deploymentDir}/${_config.basename}/package.json`
+                `${cwd_process}/settings.json`,
+                `${_config.server.deploymentDir}/${_config.appName}/settings.json`
             );
             console.log(`Upload Dockerfile Success`);
             console.log(`Upload package.json Success`);
@@ -152,7 +156,7 @@ module.exports = {
         console.log("----------------------------Start Build BASE Image ON SERVER----------------------");
         let _version_ = fs.readFileSync('image-base-version', 'utf8');
         if(_version_) _version_ = _version_.toString();
-        cmd = `cd ${_config.server.deploymentDir}/${_config.basename} && ${_config.server.sudo} docker build  -t ${_config.basename}:${_version_} .`;
+        cmd = `cd ${_config.server.deploymentDir}/${_config.appName} && ${_config.server.sudo} docker build  -t ${_config.basename}:${_version_} .`;
         return await this.runCommand(cmd, ssh, "Build BASE Image ON SERVER successs");
     },
 };
