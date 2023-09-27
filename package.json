@@ -14,6 +14,7 @@
     "nest3-deploy-smart": "./nest3-deploy-smart/start.js",
     "nuxt-deploy-smart": "./nuxt-deploy-smart/start.js",
     "nuxt3-deploy-smart": "./nuxt3-deploy-smart/start.js",
+    "nuxt2023-deploy-smart": "./nuxt2023-deploy-smart/start.js",
     "node-deploy-smart": "./node-deploy-smart/start.js",
     "meteor-deploy-smart": "./meteor-deploy-smart/start.js",
     "static-deploy-smart": "./static-deploy-smart/start.js"

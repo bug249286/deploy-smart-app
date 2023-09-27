@@ -129,6 +129,15 @@ module.exports = {
             await this.runCommand(cmd, ssh, "Run Container completed");
         }
 
+        // if (_config.useEnv === true) {
+        //     let cwd_process = process.cwd();
+        //     await ssh.putFile(
+        //         `${cwd_process}/.env`,
+        //         `${_config.server.deploymentDir}/${_config.appName}/dist/.env`
+        //     );
+        //     console.log("Upload Dockerfile && .env Success");
+        // }
+
         if (typeof _config.multiapp !== 'undefined' && _config.multiapp === true) {
             cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/${_config.appBuild}/. ${_config.appName}:/usr/src/app/dist`;
         } else {
@@ -137,6 +146,8 @@ module.exports = {
         await this.runCommand(cmd, ssh, "copy dist success ");
         if (_config.useEnv === true) {
             cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/.env ${_config.appName}:/usr/src/app/.env`;
+            await this.runCommand(cmd, ssh, "copy .env success ");
+            cmd = `${_config.server.sudo} docker cp ${_config.server.deploymentDir}/${_config.appName}/.env ${_config.appName}:/usr/src/app/dist/.env`;
             await this.runCommand(cmd, ssh, "copy .env success ");
         }
         //await ssh.exec(`docker exec -t ${_config.appName} pm2 restart 0`,[],{});

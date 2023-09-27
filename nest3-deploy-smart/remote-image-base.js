@@ -6,10 +6,10 @@ const abs = require("abs");
 const md5 = require("md5");
 const rimraf = require("rimraf");
 module.exports = {
-    rem:(s)=>{
+    rem: (s) => {
         return s.toString().replace(/\s+/g, '');;
     },
-    check_package: async function() {
+    check_package: async function () {
         console.log('START CHECK IMAGE VERSION');
         let cwd_process = process.cwd();
         let config = require(path.resolve(cwd_process, './config.json'));
@@ -128,6 +128,14 @@ module.exports = {
                 `${cwd_process}/package.json`,
                 `${_config.server.deploymentDir}/${_config.basename}/package.json`
             );
+            if (typeof _config.copyfiles === 'object' && Array.isArray(_config.copyfiles) && _config.copyfiles.length > 0) {
+                for (let file of _config.copyfiles) {
+                    await ssh.putFile(
+                        `${cwd_process}/${file}`,
+                        `${_config.server.deploymentDir}/${_config.basename}/${file}`
+                    );
+                }
+            }
             console.log(`Upload Dockerfile Success`);
             console.log(`Upload package.json Success`);
         } catch (err) {
@@ -138,12 +146,12 @@ module.exports = {
         }
         return true;
     },
-    existsRemoteImage:async function(_config, ssh){
+    existsRemoteImage: async function (_config, ssh) {
         let _version_ = fs.readFileSync('image-base-version', 'utf8');
-        if(_version_) _version_ = _version_.toString();
-        let check_image_already = await this.runCommand(`[ -z "$(docker images -q ${_config.basename}:${_version_})" ] && echo 'N' || echo 'Y'`,ssh,'check image on server');
-        console.log(`${_config.basename}:${_version_}`,check_image_already);
-        if (check_image_already.trim()==='Y') {
+        if (_version_) _version_ = _version_.toString();
+        let check_image_already = await this.runCommand(`[ -z "$(docker images -q ${_config.basename}:${_version_})" ] && echo 'N' || echo 'Y'`, ssh, 'check image on server');
+        console.log(`${_config.basename}:${_version_}`, check_image_already);
+        if (check_image_already.trim() === 'Y') {
             return true;
         }
         return false;
@@ -151,7 +159,7 @@ module.exports = {
     buildImage: async function (_config, ssh) {
         console.log("----------------------------Start Build BASE Image ON SERVER----------------------");
         let _version_ = fs.readFileSync('image-base-version', 'utf8');
-        if(_version_) _version_ = _version_.toString();
+        if (_version_) _version_ = _version_.toString();
         cmd = `cd ${_config.server.deploymentDir}/${_config.basename} && ${_config.server.sudo} docker build  -t ${_config.basename}:${_version_} .`;
         return await this.runCommand(cmd, ssh, "Build BASE Image ON SERVER successs");
     },

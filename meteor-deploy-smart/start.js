@@ -9,7 +9,7 @@ program
     .description('init application config')
     .action(async function () {
         //await Local.init()
-        //await Base.init()
+        await Base.init()
     })
 program
     .command('start')
@@ -24,7 +24,7 @@ program
         const config_json = Remote.config(config)
         const ssh = await Remote.connect(config_json)
         let isRemoteBase = true;
-        // await Base.check_package();
+        await Base.check_package();
         // let isRemoteBase = await Base.existsRemoteImage(config_json, ssh);
         // if (isRemoteBase === false) {
         //     const result_init = await Base.initHost(config_json, ssh)
